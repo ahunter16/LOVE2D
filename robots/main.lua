@@ -12,10 +12,10 @@ bullets = {}
 
 function CheckCollision(e1, e2)
 
-	return e1.x < e2.x+e2.img:getWidth() and
-         e2.x < e1.x+e1.img:getWidth() and
-         e1.y < e2.y+e2.img:getHeight() and
-         e2.y < e1.y+e1.img:getHeight()
+	return e1.x < e2.x+e2.img:getWidth()/2 and
+         e2.x < e1.x+e1.img:getWidth()+e2.img:getWidth()/2 and
+         e1.y < e2.y+e2.img:getHeight()/2 and
+         e2.y < e1.y+e1.img:getHeight()+e2.img:getHeight()/2
 end
 
 function love.load(arg)
@@ -39,6 +39,13 @@ function love.update(dt)
 		end
 	end
 
+	if love.keyboard.isDown('w') then
+		if player. y > player.img:getHeight()/2 then
+			player.y = player.y - (player.speed * dt)*math.cos(player.r) -- convert to radians
+			player.x = player.x + (player.speed * dt)*math.sin(player.r)
+		end
+	end
+
 	if love.keyboard.isDown('q') then
 		if player.r - dt < 0 then
 			player.r = 360 + (player.r - 50*dt)
@@ -48,7 +55,7 @@ function love.update(dt)
 
 	if love.keyboard.isDown('e') then
 		if player.r + dt > 360 then
-			player.r = (player.r + 50*dt) - 360
+			player.r = (player.r + 50*dt) - 360 
 		else player.r = player.r + 50*dt
 		end
 	end
@@ -75,21 +82,6 @@ function love.update(dt)
 	end
 
 
-	for i, enemy in ipairs(enemies) do
-		for j, bullet in ipairs(bullets) do
-			if CheckCollision(enemy, bullet) then
-				table.remove(bullets, j)
-				table.remove(enemies, i)
-				score = score + 1
-			end
-		end
-
-		if CheckCollision(enemy, player) and isAlive then
-			table.remove(enemies, i)
-			--isAlive = false
-		end
-	end
-
 end
 
 function love.draw(dt)
@@ -98,11 +90,7 @@ function love.draw(dt)
 		love.graphics.draw(bullet.img, bullet.x, bullet.y)
 	end
 
-	for i, enemy in ipairs(enemies) do
-		love.graphics.draw(enemy.img, enemy.x, enemy.y)
-	end
-
-	love.graphics.print(score, 0, 0)
+	--love.graphics.print(score, 0, 0)
 	love.graphics.print(player.r, 20, 0)
 
 
