@@ -18,6 +18,18 @@ enemyImg = nil
 
 enemies = {}
 
+isAlive = true
+
+score = 0
+
+function CheckCollision(e1, e2)
+
+	return e1.x < e2.x+e2.img:getWidth() and
+         e2.x < e1.x+e1.img:getWidth() and
+         e1.y < e2.y+e2.img:getHeight() and
+         e2.y < e1.y+e1.img:getHeight()
+end
+
 function love.load(arg)
 	player.img = love.graphics.newImage('assets/comp.png')
 	bulletImg = love.graphics.newImage('assets/bullet.png')
@@ -76,6 +88,21 @@ function love.update(dt)
 		table.insert(enemies, newEnemy)
 	end
 
+	for i, enemy in ipairs(enemies) do
+		for j, bullet in ipairs(bullets) do
+			if CheckCollision(enemy, bullet) then
+				table.remove(bullets, j)
+				table.remove(enemies, i)
+				score = score + 1
+			end
+		end
+
+		if CheckCollision(enemy, player) and isAlive then
+			table.remove(enemies, i)
+			--isAlive = false
+		end
+	end
+
 end
 
 function love.draw(dt)
@@ -87,6 +114,8 @@ function love.draw(dt)
 	for i, enemy in ipairs(enemies) do
 		love.graphics.draw(enemy.img, enemy.x, enemy.y)
 	end
+
+	love.graphics.print(score, 0, 0)
 
 
 end
