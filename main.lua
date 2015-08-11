@@ -11,17 +11,17 @@ bulletImg = nil
 
 bullets = {}
 
---createEnemyTimerMax = 0.4
---createEnemyTimer = createEnemyTimerMax
+createEnemyTimerMax = 0.4
+createEnemyTimer = createEnemyTimerMax
 
---enemyImg = nil
+enemyImg = nil
 
---enemies = {}
+enemies = {}
 
 function love.load(arg)
 	player.img = love.graphics.newImage('assets/comp.png')
 	bulletImg = love.graphics.newImage('assets/bullet.png')
-	enemyImg = love.graphics.newImage('assets/comp.png')
+	enemyImg = love.graphics.newImage('assets/enemy.png')
 end
 
 function love.update(dt)
@@ -58,6 +58,24 @@ function love.update(dt)
 			table.remove(bullets, i)
 		end
 	end
+
+	for i, enemy in ipairs(enemies) do
+		enemy.y = enemy.y + (100 * dt)
+
+		if enemy.y > 850 then
+			table.remove(enemies, i)
+		end
+	end
+
+
+	createEnemyTimer = createEnemyTimer - (1 * dt)
+	if createEnemyTimer < 0 then
+		createEnemyTimer = createEnemyTimerMax
+		randomNumber = math.random(10, love.graphics.getWidth() - 10)
+		newEnemy = {x = randomNumber, y = -10, img = enemyImg }
+		table.insert(enemies, newEnemy)
+	end
+
 end
 
 function love.draw(dt)
@@ -65,5 +83,10 @@ function love.draw(dt)
 	for i, bullet in ipairs(bullets) do
 		love.graphics.draw(bullet.img, bullet.x, bullet.y)
 	end
+
+	for i, enemy in ipairs(enemies) do
+		love.graphics.draw(enemy.img, enemy.x, enemy.y)
+	end
+
 
 end
