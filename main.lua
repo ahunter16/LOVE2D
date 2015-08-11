@@ -84,7 +84,7 @@ function love.update(dt)
 	if createEnemyTimer < 0 then
 		createEnemyTimer = createEnemyTimerMax
 		randomNumber = math.random(10, love.graphics.getWidth() - 10)
-		newEnemy = {x = randomNumber, y = -10, img = enemyImg }
+		newEnemy = {x = randomNumber, y = (0 - enemyImg:getHeight()), img = enemyImg }
 		table.insert(enemies, newEnemy)
 	end
 
