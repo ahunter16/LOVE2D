@@ -1,7 +1,7 @@
 --a simple "game" I've been making at lunch!
 debug = true
 
-player= { x = 200, y = 710, speed= 200, img = nil}
+player= { x = 200, y = 510, speed= 200, img = nil}
 
 canShoot = true
 canShootTimerMax = 0.2
@@ -74,7 +74,7 @@ function love.update(dt)
 	for i, enemy in ipairs(enemies) do
 		enemy.y = enemy.y + (100 * dt)
 
-		if enemy.y > 850 then
+		if enemy.y > 650 then
 			table.remove(enemies, i)
 		end
 	end
