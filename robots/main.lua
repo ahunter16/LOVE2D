@@ -1,6 +1,7 @@
 debug = true
 
-player= { x = 200, y = 510, r = 0, speed= 200, img = nil}
+player = { x = 200, y = 510, r = 0, speed= 200, img = nil}
+triangle = { dmg = 1, pos = {0,0,0,0,0,0}}
 
 canShoot = true
 canShootTimerMax = 0.2
@@ -29,34 +30,32 @@ function love.update(dt)
 		love.event.push('quit')
 	end
 
-	if love.keyboard.isDown('left', 'a') then
-		if player.x > 0 then
-			player.x = (player.x - (player.speed*dt))
-		end
-	elseif love.keyboard.isDown('right', 'd') then
-		if player.x < (love.graphics.getWidth() - player.img:getWidth()) then
-			player.x = (player.x + (player.speed*dt))
-		end
-	end
+	triangle.pos={player.x+player.img:getWidth(), player.y + player.img:getHeight()/2, player.x+player.img:getWidth(), player.y + player.img:getHeight()/2, player.x, player.y + player.img:getHeight()}
 
 	if love.keyboard.isDown('w') then
 		if player. y > player.img:getHeight()/2 then
-			player.y = player.y - (player.speed * dt)*math.cos(player.r) -- convert to radians
-			player.x = player.x + (player.speed * dt)*math.sin(player.r)
+			player.y = player.y - (player.speed * dt)*math.cos(math.rad(player.r)) -- convert to radians
+			player.x = player.x + (player.speed * dt)*math.sin(math.rad(player.r))
+		end
+	end
+	if love.keyboard.isDown('s') then
+		if player. y > player.img:getHeight()/2 then
+			player.y = player.y + (player.speed * dt)*math.cos(math.rad(player.r)) -- convert to radians
+			player.x = player.x - (player.speed * dt)*math.sin(math.rad(player.r))
 		end
 	end
 
-	if love.keyboard.isDown('q') then
+	if love.keyboard.isDown('a') then
 		if player.r - dt < 0 then
-			player.r = 360 + (player.r - 50*dt)
-		else player.r = player.r - 50*dt
+			player.r = 360 + (player.r - 100*dt)
+		else player.r = player.r - 100*dt
 		end
 	end
 
-	if love.keyboard.isDown('e') then
+	if love.keyboard.isDown('d') then
 		if player.r + dt > 360 then
-			player.r = (player.r + 50*dt) - 360 
-		else player.r = player.r + 50*dt
+			player.r = (player.r + 100*dt) - 360 
+		else player.r = player.r + 100*dt
 		end
 	end
 
@@ -89,9 +88,11 @@ function love.draw(dt)
 	for i, bullet in ipairs(bullets) do
 		love.graphics.draw(bullet.img, bullet.x, bullet.y)
 	end
-
-	--love.graphics.print(score, 0, 0)
 	love.graphics.print(player.r, 20, 0)
+	love.graphics.setColor(255,0,0)
+	love.graphics.polygon("fill", triangle.pos)
+	--love.graphics.print(score, 0, 0)
+	
 
 
 end
