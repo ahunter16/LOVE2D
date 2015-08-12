@@ -61,7 +61,7 @@ function love.update(dt)
 
 
 	if love.keyboard.isDown(' ') and canShoot then
-		newBullet = { x = player.x + (player.img:getWidth()/2), y = player.y, img = bulletImg }
+		newBullet = { x = player.x, y = player.y + (player.img:getHeight()/2), img = bulletImg }
 		table.insert(bullets, newBullet)
 		canShoot = false
 		canShootTimer = canShootTimerMax
@@ -89,7 +89,7 @@ function love.draw(dt)
 		love.graphics.draw(bullet.img, bullet.x, bullet.y)
 	end
 	love.graphics.print(player.r, 20, 0)
-	love.graphics.setColor(255,0,0)
+
 	love.graphics.polygon("fill", triangle.pos)
 	--love.graphics.print(score, 0, 0)
 	
