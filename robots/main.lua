@@ -76,6 +76,7 @@ function love.update(dt)
 			canShoot = false
 			canShootTimer = canShootTimerMax
 		end
+	end
 
 	canShootTimer = canShootTimer - dt
 	canshoot2 = canshoot2 - dt
@@ -97,13 +98,15 @@ function love.update(dt)
 end
 
 function love.draw(dt)
-	love.graphics.draw(player.img, player.x, player.y, math.rad(player.r), 1, 1, player.img:getWidth()/2, player.img:getHeight()/2)
+	for i, player in ipairs(players) do
+		love.graphics.draw(player.img, player.x, player.y, math.rad(player.r), 1, 1, player.img:getWidth()/2, player.img:getHeight()/2)
+	end
 	for i, bullet in ipairs(bullets) do
 		love.graphics.draw(bullet.img, bullet.x, bullet.y, bullet.angle, 1, 1, bullet.img:getWidth()/2, bullet.img:getHeight()/2)
 
 	end
 	love.graphics.print(player.r, 20, 0)
-	love.graphics.polygon("fill", 100, 0, 150, 50, 50, 50)
+	--love.graphics.polygon("fill", 100, 0, 125, 50, 75, 50)
 	love.graphics.polygon("fill", triangle.pos)
 	--love.graphics.print(score, 0, 0)
 	
