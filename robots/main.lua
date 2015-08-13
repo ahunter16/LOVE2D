@@ -1,7 +1,7 @@
 debug = true
 
-player = { x = 200, y = 510, r = 0, speed= 500, img = nil, fw='w', bk='s', lf='a', rt='d', fire = ' '}
-player2 = { x = 200, y = 100, r = 180, speed= 500, img= nil, fw='up', bk='down', lf='left', rt='right', fire = 'm'}
+player = { x = 200, y = 510, r = 0, speed= 500, img = nil, fw='w', bk='s', lf='a', rt='d', fire = ' ', dmg = 10, health = 100}
+player2 = { x = 200, y = 100, r = 180, speed= 500, img= nil, fw='up', bk='down', lf='left', rt='right', fire = 'm', dmg = 10, health = 100}
 triangle = { dmg = 1, pos = {0,0,0,0,0,0}}
 
 players = {}
@@ -71,7 +71,7 @@ function love.update(dt)
 
 
 		if love.keyboard.isDown(player.fire) and canShoot then
-			newBullet = { x = player.x + player.img:getHeight()/2*math.sin(math.rad(player.r)), y = player.y - (player.img:getHeight()/2), img = bulletImg, angle = math.rad(player.r), xvel = 500*math.sin(math.rad(player.r)), yvel = 500 * math.cos(math.rad(player.r))}
+			newBullet = { dmg = player.dmg, x = player.x + player.img:getHeight()/2*math.sin(math.rad(player.r)), y = player.y - (player.img:getHeight()/2), img = bulletImg, angle = math.rad(player.r), xvel = 1000*math.sin(math.rad(player.r)), yvel = 1000 * math.cos(math.rad(player.r))}
 			table.insert(bullets, newBullet)
 			canShoot = false
 			canShootTimer = canShootTimerMax
@@ -88,11 +88,22 @@ function love.update(dt)
 	for i, bullet in ipairs(bullets) do 
 		bullet.x = bullet.x + bullet.xvel*dt
 		bullet.y = bullet.y - bullet.yvel*dt
-		--bullet.y = bullet.y - (500 * dt)
 		if bullet.y < 0 then
 			table.remove(bullets, i)
 		end
 	end
+
+	for i, bullet in ipairs(bullets) do
+		for i, player in ipairs(players) do
+			if CheckCollision(player, bullet) then
+				player.health = player.health - bullet.dmg
+				table.remove(bullets, i)
+				
+			end
+		end
+	end
+
+
 
 
 end
@@ -105,7 +116,8 @@ function love.draw(dt)
 		love.graphics.draw(bullet.img, bullet.x, bullet.y, bullet.angle, 1, 1, bullet.img:getWidth()/2, bullet.img:getHeight()/2)
 
 	end
-	love.graphics.print(player.r, 20, 0)
+	love.graphics.print(player.health, 20, 0)
+	love.graphics.print(player2.health, 100, 0)
 	--love.graphics.polygon("fill", 100, 0, 125, 50, 75, 50)
 	love.graphics.polygon("fill", triangle.pos)
 	--love.graphics.print(score, 0, 0)
