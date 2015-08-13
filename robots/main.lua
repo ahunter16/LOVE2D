@@ -1,8 +1,10 @@
 debug = true
 
-player = { x = 200, y = 510, r = 0, speed= 200, img = nil}
+player = { x = 200, y = 510, r = 0, speed= 500, img = nil, fw='w', bk='s', lf='a', rt='d', fire = ' '}
+--player2 = { x = 200, y = 100, r = 180, speed= 500, img= nil}
 triangle = { dmg = 1, pos = {0,0,0,0,0,0}}
-
+--make infinite no of players: use array of them, store controls either in their objecto or a separate table with their name
+players = {}
 canShoot = true
 canShootTimerMax = 0.2
 canShootTimer = canShootTimerMax
@@ -21,8 +23,9 @@ end
 
 function love.load(arg)
 	player.img = love.graphics.newImage('assets/comp.png')
+	player2.img = love.graphics.newImage('assets/enemy.png')
 	bulletImg = love.graphics.newImage('assets/bullet.png')
-	enemyImg = love.graphics.newImage('assets/enemy.png')
+
 end
 
 function love.update(dt)
@@ -38,10 +41,23 @@ function love.update(dt)
 			player.x = player.x + (player.speed * dt)*math.sin(math.rad(player.r))
 		end
 	end
+	if love.keyboard.isDown('up') then
+		if player2. y > player2.img:getHeight()/2 then
+			player2.y = player2.y - (player2.speed * dt)*math.cos(math.rad(player2.r)) -- convert to radians
+			player2.x = player2.x + (player2.speed * dt)*math.sin(math.rad(player2.r))
+		end
+	end
 	if love.keyboard.isDown('s') then
 		if player. y > player.img:getHeight()/2 then
 			player.y = player.y + (player.speed * dt)*math.cos(math.rad(player.r)) -- convert to radians
 			player.x = player.x - (player.speed * dt)*math.sin(math.rad(player.r))
+		end
+	end
+
+	if love.keyboard.isDown('down') then
+		if player2. y > player2.img:getHeight()/2 then
+			player2.y = player2.y + (player2.speed * dt)*math.cos(math.rad(player2.r)) -- convert to radians
+			player2.x = player2.x - (player2.speed * dt)*math.sin(math.rad(player2.r))
 		end
 	end
 
@@ -52,10 +68,24 @@ function love.update(dt)
 		end
 	end
 
+	if love.keyboard.isDown('left') then
+		if player2.r - dt < 0 then
+			player2.r = 360 + (player2.r - 100*dt)
+		else player2.r = player2.r - 100*dt
+		end
+	end
+
 	if love.keyboard.isDown('d') then
 		if player.r + dt > 360 then
 			player.r = (player.r + 100*dt) - 360 
 		else player.r = player.r + 100*dt
+		end
+	end
+
+	if love.keyboard.isDown('right') then
+		if player2.r + dt > 360 then
+			player2.r = (player2.r + 100*dt) - 360 
+		else player2.r = player2.r + 100*dt
 		end
 	end
 
@@ -88,11 +118,11 @@ end
 function love.draw(dt)
 	love.graphics.draw(player.img, player.x, player.y, math.rad(player.r), 1, 1, player.img:getWidth()/2, player.img:getHeight()/2)
 	for i, bullet in ipairs(bullets) do
-		--love.graphics.draw(bullet.img, bullet.x, bullet.y)
-		love.graphics.circle("fill", bullet.x, bullet.y, 5)
+		love.graphics.draw(bullet.img, bullet.x, bullet.y, bullet.angle, 1, 1, bullet.img:getWidth()/2, bullet.img:getHeight()/2)
+
 	end
 	love.graphics.print(player.r, 20, 0)
-
+	love.graphics.polygon("fill", 100, 0, 150, 50, 50, 50)
 	love.graphics.polygon("fill", triangle.pos)
 	--love.graphics.print(score, 0, 0)
 	
