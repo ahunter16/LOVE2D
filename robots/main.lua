@@ -61,7 +61,7 @@ function love.update(dt)
 
 
 	if love.keyboard.isDown(' ') and canShoot then
-		newBullet = { x = player.x, y = player.y + (player.img:getHeight()/2), img = bulletImg }
+		newBullet = { x = player.x + player.img:getHeight()/2*math.sin(math.rad(player.r)), y = player.y - (player.img:getHeight()/2), img = bulletImg, angle = math.rad(player.r), xvel = 500*math.sin(math.rad(player.r)), yvel = 500 * math.cos(math.rad(player.r))}
 		table.insert(bullets, newBullet)
 		canShoot = false
 		canShootTimer = canShootTimerMax
@@ -74,7 +74,9 @@ function love.update(dt)
 	end
 
 	for i, bullet in ipairs(bullets) do 
-		bullet.y = bullet.y - (500 * dt)
+		bullet.x = bullet.x + bullet.xvel*dt
+		bullet.y = bullet.y - bullet.yvel*dt
+		--bullet.y = bullet.y - (500 * dt)
 		if bullet.y < 0 then
 			table.remove(bullets, i)
 		end
@@ -86,7 +88,8 @@ end
 function love.draw(dt)
 	love.graphics.draw(player.img, player.x, player.y, math.rad(player.r), 1, 1, player.img:getWidth()/2, player.img:getHeight()/2)
 	for i, bullet in ipairs(bullets) do
-		love.graphics.draw(bullet.img, bullet.x, bullet.y)
+		--love.graphics.draw(bullet.img, bullet.x, bullet.y)
+		love.graphics.circle("fill", bullet.x, bullet.y, 5)
 	end
 	love.graphics.print(player.r, 20, 0)
 
