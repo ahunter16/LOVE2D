@@ -1,12 +1,14 @@
 debug = true
 
 player = { x = 200, y = 510, r = 0, speed= 500, img = nil, fw='w', bk='s', lf='a', rt='d', fire = ' '}
---player2 = { x = 200, y = 100, r = 180, speed= 500, img= nil}
+player2 = { x = 200, y = 100, r = 180, speed= 500, img= nil, fw='up', bk='down', lf='left', rt='right', fire = 'm'}
 triangle = { dmg = 1, pos = {0,0,0,0,0,0}}
---make infinite no of players: use array of them, store controls either in their objecto or a separate table with their name
+
 players = {}
 canShoot = true
 canShootTimerMax = 0.2
+canshoot2 = 0.2
+canshoot2 = canShootTimerMax
 canShootTimer = canShootTimerMax
 
 bulletImg = nil
@@ -25,6 +27,8 @@ function love.load(arg)
 	player.img = love.graphics.newImage('assets/comp.png')
 	player2.img = love.graphics.newImage('assets/enemy.png')
 	bulletImg = love.graphics.newImage('assets/bullet.png')
+	table.insert(players, player)
+	table.insert(players, player2)
 
 end
 
@@ -35,69 +39,46 @@ function love.update(dt)
 
 	triangle.pos={player.x+player.img:getWidth(), player.y + player.img:getHeight()/2, player.x+player.img:getWidth(), player.y + player.img:getHeight()/2, player.x, player.y + player.img:getHeight()}
 
-	if love.keyboard.isDown('w') then
-		if player. y > player.img:getHeight()/2 then
-			player.y = player.y - (player.speed * dt)*math.cos(math.rad(player.r)) -- convert to radians
-			player.x = player.x + (player.speed * dt)*math.sin(math.rad(player.r))
+	for i, player in ipairs(players) do 
+		if love.keyboard.isDown(player.fw) then
+			if player. y > player.img:getHeight()/2 then
+				player.y = player.y - (player.speed * dt)*math.cos(math.rad(player.r)) -- convert to radians
+				player.x = player.x + (player.speed * dt)*math.sin(math.rad(player.r))
+			end
 		end
-	end
-	if love.keyboard.isDown('up') then
-		if player2. y > player2.img:getHeight()/2 then
-			player2.y = player2.y - (player2.speed * dt)*math.cos(math.rad(player2.r)) -- convert to radians
-			player2.x = player2.x + (player2.speed * dt)*math.sin(math.rad(player2.r))
-		end
-	end
-	if love.keyboard.isDown('s') then
-		if player. y > player.img:getHeight()/2 then
-			player.y = player.y + (player.speed * dt)*math.cos(math.rad(player.r)) -- convert to radians
-			player.x = player.x - (player.speed * dt)*math.sin(math.rad(player.r))
-		end
-	end
 
-	if love.keyboard.isDown('down') then
-		if player2. y > player2.img:getHeight()/2 then
-			player2.y = player2.y + (player2.speed * dt)*math.cos(math.rad(player2.r)) -- convert to radians
-			player2.x = player2.x - (player2.speed * dt)*math.sin(math.rad(player2.r))
+		if love.keyboard.isDown(player.bk) then
+			if player. y > player.img:getHeight()/2 then
+				player.y = player.y + (player.speed * dt)*math.cos(math.rad(player.r)) -- convert to radians
+				player.x = player.x - (player.speed * dt)*math.sin(math.rad(player.r))
+			end
 		end
-	end
-
-	if love.keyboard.isDown('a') then
-		if player.r - dt < 0 then
-			player.r = 360 + (player.r - 100*dt)
-		else player.r = player.r - 100*dt
-		end
-	end
-
-	if love.keyboard.isDown('left') then
-		if player2.r - dt < 0 then
-			player2.r = 360 + (player2.r - 100*dt)
-		else player2.r = player2.r - 100*dt
-		end
-	end
-
-	if love.keyboard.isDown('d') then
-		if player.r + dt > 360 then
-			player.r = (player.r + 100*dt) - 360 
-		else player.r = player.r + 100*dt
-		end
-	end
-
-	if love.keyboard.isDown('right') then
-		if player2.r + dt > 360 then
-			player2.r = (player2.r + 100*dt) - 360 
-		else player2.r = player2.r + 100*dt
-		end
-	end
 
 
-	if love.keyboard.isDown(' ') and canShoot then
-		newBullet = { x = player.x + player.img:getHeight()/2*math.sin(math.rad(player.r)), y = player.y - (player.img:getHeight()/2), img = bulletImg, angle = math.rad(player.r), xvel = 500*math.sin(math.rad(player.r)), yvel = 500 * math.cos(math.rad(player.r))}
-		table.insert(bullets, newBullet)
-		canShoot = false
-		canShootTimer = canShootTimerMax
-	end
+		if love.keyboard.isDown(player.lf) then
+			if player.r - dt < 0 then
+				player.r = 360 + (player.r - 100*dt)
+			else player.r = player.r - 100*dt
+			end
+		end
 
-	canShootTimer = canShootTimer - (1*dt)
+		if love.keyboard.isDown(player.rt) then
+			if player.r + dt > 360 then
+				player.r = (player.r + 100*dt) - 360 
+			else player.r = player.r + 100*dt
+			end
+		end
+
+
+		if love.keyboard.isDown(player.fire) and canShoot then
+			newBullet = { x = player.x + player.img:getHeight()/2*math.sin(math.rad(player.r)), y = player.y - (player.img:getHeight()/2), img = bulletImg, angle = math.rad(player.r), xvel = 500*math.sin(math.rad(player.r)), yvel = 500 * math.cos(math.rad(player.r))}
+			table.insert(bullets, newBullet)
+			canShoot = false
+			canShootTimer = canShootTimerMax
+		end
+
+	canShootTimer = canShootTimer - dt
+	canshoot2 = canshoot2 - dt
 
 	if canShootTimer < 0 then
 		canShoot= true
