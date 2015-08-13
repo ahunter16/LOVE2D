@@ -15,7 +15,7 @@ bulletImg = nil
 
 bullets = {}
 
-function CheckCollision(e1, e2)
+function CheckCollision(e1, e2) -- modify to make 2 entities with central coordinates collide
 
 	return e1.x < e2.x+e2.img:getWidth()/2 and
          e2.x < e1.x+e1.img:getWidth()+e2.img:getWidth()/2 and
@@ -84,6 +84,7 @@ function love.update(dt)
 	if canShootTimer < 0 then
 		canShoot= true
 	end
+
 	for i, bullet in ipairs(bullets) do
 		for j, player in ipairs(players) do
 			if CheckCollision(player, bullet) then
