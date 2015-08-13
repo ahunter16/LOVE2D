@@ -84,6 +84,14 @@ function love.update(dt)
 	if canShootTimer < 0 then
 		canShoot= true
 	end
+	for i, bullet in ipairs(bullets) do
+		for j, player in ipairs(players) do
+			if CheckCollision(player, bullet) then
+				player.health = player.health - bullet.dmg
+				table.remove(bullets, i)
+			end
+		end
+	end
 
 	for i, bullet in ipairs(bullets) do 
 		bullet.x = bullet.x + bullet.xvel*dt
@@ -92,17 +100,6 @@ function love.update(dt)
 			table.remove(bullets, i)
 		end
 	end
-
-	for i, bullet in ipairs(bullets) do
-		for i, player in ipairs(players) do
-			if CheckCollision(player, bullet) then
-				player.health = player.health - bullet.dmg
-				table.remove(bullets, i)
-				
-			end
-		end
-	end
-
 
 
 
@@ -120,8 +117,5 @@ function love.draw(dt)
 	love.graphics.print(player2.health, 100, 0)
 	--love.graphics.polygon("fill", 100, 0, 125, 50, 75, 50)
 	love.graphics.polygon("fill", triangle.pos)
-	--love.graphics.print(score, 0, 0)
-	
-
-
+	--love.graphics.print(score, 0, 0)	
 end
