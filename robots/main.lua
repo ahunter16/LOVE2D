@@ -1,8 +1,8 @@
 debug = true
 
-player = { x = 200, y = 510, r = 0, speed= 500, img = nil, fw='w', bk='s', lf='a', rt='d', fire = ' ', dmg = 10, health = 100}
-player2 = { x = 200, y = 100, r = 180, speed= 500, img= nil, fw='up', bk='down', lf='left', rt='right', fire = 'm', dmg = 10, health = 100}
-triangle = { dmg = 1, pos = {0,0,0,0,0,0}}
+player = { x = love.graphics:getWidth()/2, y = 510, r = 0, speed= 0, img = nil, fw='w', bk='s', lf='a', rt='d', fire = ' ', lsc = 'q', rsc = 'e', dmg = 10, health = 100, accel = 10}
+player2 = { x = love.graphics:getWidth()/2, y = 100, r = 180, speed= 0, img= nil, fw='up', bk='down', lf='left', rt='right', fire = 'm', lsc = 1, rsc = 3, dmg = 10, health = 100, accel = 10}
+circle = { dmg = 1, x = 0, y = 0, offset =1.2, angle = 0} --offset = distance from center, angle = clockwiseangle from horizontal 
 
 players = {}
 canShoot = true
@@ -17,10 +17,15 @@ bullets = {}
 
 function CheckCollision(e1, e2) -- modify to make 2 entities with central coordinates collide
 
-	return e1.x < e2.x+e2.img:getWidth()/2 and
-         e2.x < e1.x+e1.img:getWidth()+e2.img:getWidth()/2 and
-         e1.y < e2.y+e2.img:getHeight()/2 and
-         e2.y < e1.y+e1.img:getHeight()+e2.img:getHeight()/2
+	return e1.x - e1.img:getHeight()/2 < e2.x+e2.img:getWidth()/2 and
+         e2.x < e1.x+e1.img:getWidth()/2+e2.img:getWidth()/2 and
+         e1.y - e1.img:getHeight()/2 < e2.y+e2.img:getHeight()/2 and
+         e2.y < e1.y+e1.img:getHeight()/2+e2.img:getHeight()/2
+end
+
+function ObjCoord(shape, player)
+	shape.x = player.x - ((player.img:getWidth()/2) * shape.offset * math.cos(math.rad(player.r)+ shape.angle))
+	shape.y = player.y - ((player.img:getWidth()/2) * shape.offset * math.sin(math.rad(player.r)+ shape.angle))
 end
 
 function love.load(arg)
@@ -29,6 +34,7 @@ function love.load(arg)
 	bulletImg = love.graphics.newImage('assets/bullet.png')
 	table.insert(players, player)
 	table.insert(players, player2)
+	circle.angle= math.rad(20) + math.atan((player.img:getHeight()/2)/player.img:getWidth()/2)
 
 end
 
@@ -37,21 +43,28 @@ function love.update(dt)
 		love.event.push('quit')
 	end
 
-	triangle.pos={player.x+player.img:getWidth(), player.y + player.img:getHeight()/2, player.x+player.img:getWidth(), player.y + player.img:getHeight()/2, player.x, player.y + player.img:getHeight()}
+	--triangle.pos={player.x+player.img:getWidth(), player.y + player.img:getHeight()/2, player.x+player.img:getWidth(), player.y + player.img:getHeight()/2, player.x, player.y + player.img:getHeight()}
 
 	for i, player in ipairs(players) do 
+		if love.keyboard.isDown(player.fw) or love.keyboard.isDown(player.bk) then
+			player.speed = player.speed + player.accel
+		elseif player.speed < 10 then
+			player.speed = 0
+		else player.speed = player.speed - 10
+		end
+
 		if love.keyboard.isDown(player.fw) then
-			if player. y > player.img:getHeight()/2 then
-				player.y = player.y - (player.speed * dt)*math.cos(math.rad(player.r)) -- convert to radians
+			--if player. y > player.img:getHeight()/2 then
+				player.y = player.y - (player.speed * dt)*math.cos(math.rad(player.r))
 				player.x = player.x + (player.speed * dt)*math.sin(math.rad(player.r))
-			end
+			--end
 		end
 
 		if love.keyboard.isDown(player.bk) then
-			if player. y > player.img:getHeight()/2 then
-				player.y = player.y + (player.speed * dt)*math.cos(math.rad(player.r)) -- convert to radians
+			--if player. y > player.img:getHeight()/2 then
+				player.y = player.y + (player.speed * dt)*math.cos(math.rad(player.r))
 				player.x = player.x - (player.speed * dt)*math.sin(math.rad(player.r))
-			end
+			--end
 		end
 
 
@@ -69,9 +82,17 @@ function love.update(dt)
 			end
 		end
 
+		if love.keyboard.isDown(player.lsc) then
+			player.x = player.x - player.speed * dt
+		end
 
-		if love.keyboard.isDown(player.fire) and canShoot then
-			newBullet = { dmg = player.dmg, x = player.x + player.img:getHeight()/2*math.sin(math.rad(player.r)), y = player.y - (player.img:getHeight()/2), img = bulletImg, angle = math.rad(player.r), xvel = 1000*math.sin(math.rad(player.r)), yvel = 1000 * math.cos(math.rad(player.r))}
+		if love.keyboard.isDown(player.rsc) then
+			player.x = player.x + player.speed * dt
+		end
+
+
+		if love.keyboard.isDown(player.fire) then--and canShoot then
+			newBullet = { dmg = player.dmg, x = player.x + (player.img:getHeight())*math.sin(math.rad(player.r)), y = player.y - (player.img:getHeight())*math.cos(math.rad(player.r)), img = bulletImg, angle = math.rad(player.r), xvel = 1000*math.sin(math.rad(player.r)), yvel = 1000 * math.cos(math.rad(player.r))}
 			table.insert(bullets, newBullet)
 			canShoot = false
 			canShootTimer = canShootTimerMax
@@ -101,7 +122,7 @@ function love.update(dt)
 			table.remove(bullets, i)
 		end
 	end
-
+	ObjCoord(circle, player)
 
 
 end
@@ -114,9 +135,14 @@ function love.draw(dt)
 		love.graphics.draw(bullet.img, bullet.x, bullet.y, bullet.angle, 1, 1, bullet.img:getWidth()/2, bullet.img:getHeight()/2)
 
 	end
+
+	love.graphics.circle("fill", circle.x, circle.y, 10) 
 	love.graphics.print(player.health, 20, 0)
 	love.graphics.print(player2.health, 100, 0)
+	love.graphics.print(circle.angle, 20, 12)
+	--love.graphics.print(AngularCoords(player), 20, 12)
+
 	--love.graphics.polygon("fill", 100, 0, 125, 50, 75, 50)
-	love.graphics.polygon("fill", triangle.pos)
+	--love.graphics.polygon("fill", triangle.pos)
 	--love.graphics.print(score, 0, 0)	
 end
