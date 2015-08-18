@@ -1,7 +1,7 @@
 debug = true
 
-player = { x = love.graphics:getWidth()/2, y = 510, r = 0, speed= 0, img = nil, fw='w', bk='s', lf='a', rt='d', fire = ' ', lsc = 'q', rsc = 'e', dmg = 10, health = 100, accel = 10}
-player2 = { x = love.graphics:getWidth()/2, y = 100, r = 180, speed= 0, img= nil, fw='up', bk='down', lf='left', rt='right', fire = 'm', lsc = 1, rsc = 3, dmg = 10, health = 100, accel = 10}
+player = {shapes = {}, x = love.graphics:getWidth()/2, y = 510, r = 0, speed= 0, img = nil, fw='w', bk='s', lf='a', rt='d', fire = ' ', lsc = 'q', rsc = 'e', dmg = 10, health = 100, accel = 30}
+player2 = { shapes = {}, x = love.graphics:getWidth()/2, y = 100, r = 180, speed= 0, img= nil, fw='up', bk='down', lf='left', rt='right', fire = 'm', lsc = 1, rsc = 3, dmg = 10, health = 100, accel = 30}
 circle = { dmg = 1, x = 0, y = 0, offset =1.2, angle = 0} --offset = distance from center, angle = clockwiseangle from horizontal 
 
 players = {}
@@ -14,6 +14,10 @@ canShootTimer = canShootTimerMax
 bulletImg = nil
 
 bullets = {}
+
+function AddShape(player, shape)
+	table.insert(player.shapes, shape)
+end
 
 function CheckCollision(e1, e2) -- modify to make 2 entities with central coordinates collide
 
@@ -34,7 +38,7 @@ function love.load(arg)
 	bulletImg = love.graphics.newImage('assets/bullet.png')
 	table.insert(players, player)
 	table.insert(players, player2)
-	circle.angle= math.rad(20) + math.atan((player.img:getHeight()/2)/player.img:getWidth()/2)
+	circle.angle= math.rad(22) + math.atan((player2.img:getHeight()/2)/player2.img:getWidth()/2)
 
 end
 
@@ -47,21 +51,24 @@ function love.update(dt)
 
 	for i, player in ipairs(players) do 
 		if love.keyboard.isDown(player.fw) or love.keyboard.isDown(player.bk) then
-			player.speed = player.speed + player.accel
-		elseif player.speed < 10 then
-			player.speed = 0
-		else player.speed = player.speed - 10
+			player.speed = player.speed
+		elseif player.speed > player.accel then
+			player.speed = player.speed - player.accel
+		else player.speed = 0
 		end
 
 		if love.keyboard.isDown(player.fw) then
 			--if player. y > player.img:getHeight()/2 then
+				player.speed = player.speed + player.accel
 				player.y = player.y - (player.speed * dt)*math.cos(math.rad(player.r))
 				player.x = player.x + (player.speed * dt)*math.sin(math.rad(player.r))
+
 			--end
 		end
 
 		if love.keyboard.isDown(player.bk) then
 			--if player. y > player.img:getHeight()/2 then
+			player.speed = player.accel + player.speed
 				player.y = player.y + (player.speed * dt)*math.cos(math.rad(player.r))
 				player.x = player.x - (player.speed * dt)*math.sin(math.rad(player.r))
 			--end
@@ -122,7 +129,7 @@ function love.update(dt)
 			table.remove(bullets, i)
 		end
 	end
-	ObjCoord(circle, player)
+	ObjCoord(circle, player2)
 
 
 end
